@@ -1,34 +1,75 @@
-- Feature Name: (fill me in with a unique identifier, `my_awesome_feature`)
-- Start Date: (fill me in with today's date, YYYY-MM-DD)
-- RFC PR: [apache/tvm-rfcs#0000](https://github.com/apache/tvm-rfcs/pull/0000)
-- GitHub Issue: [apache/tvm#0000](https://github.com/apache/tvm/issues/0000)
+- Feature Name: A permissionless, unique, physical addressing scheme
+- Start Date: 2023-02-07
+- RFC PR: [w-a-s-t-e/rfcs#0000](https://github.com/w-a-s-t-e/rfcs/pull/0000)
+- GitHub Issue: [w-a-s-t-e/issues#0000](https://github.com/w-a-s-t-e/issues/0000)
 
 # Summary
 [summary]: #summary
 
-One paragraph explanation of the feature.
+An address for anywhere on a particular planet, that any denizen of that
+location can generate without permission and with a very high likelihood of
+uniqueness.
 
 # Motivation
 [motivation]: #motivation
 
 Why are we doing this? What use cases does it support? What is the expected outcome?
 
+In developing countries, even in relatively advanced areas like La Paz, BCS, Mexico, governments can be glacially slow in assigning street names and numbers.
+
+This situation can make useless delivery addresses such as that of my workshop until a few months ago, when the street was given the name Castro Beltr&aacuten:
+
+    John Comeau
+    Calle S/N S/N (sin nombre, "without name", sin numero "without number")
+    Colonia Los Cardones
+    La Paz, BCS 23089
+
+This makes it difficult for delivery services to find one's house or business,
+necessitating GPS coordinates to be sent, typically, in Mexico, by use of
+a WhatsApp "ping" (or "pin" as it's spelled in Spanish).
+
+A universal, permissionless, widely recognized scheme for generation unique
+addresses would reduce the need for such ad-hoc solutions.
+
 # Guide-level explanation
 [guide-level-explanation]: #guide-level-explanation
 
-Explain the proposal as if it was already included in the language and you were teaching it to a TVM user. 
+The simplest solution would use unadorned GPS coordinates as the street name
+and number: if the street runs roughly north and south, the N or S component
+would be the street name, and the E or W component would be the street number.
+Vice versa for an east-west street. Either can be used if the street runs at
+a 45-degree angle from a compass point, or the street runs in all directions.
 
-That generally means:
+Using the same example as above, the improved address would be:
 
-- Introducing new named concepts.
-- Explaining what the feature enables (hint: think in terms of examples).
-- If applicable, provide sample error messages, deprecation warnings, or migration guidance.
+    John Comeau
+    Calle 24.067714NGPS 110.316302W (W instead of O for "oeste" for clarity)
+    Colonia Los Cardones
+    La Paz, BCS 23089
 
-For internal RFCs (e.g. for compiler internals), this section should focus on how core contributors s
-hould think about the change, and give examples of its concrete impact. 
+This may work fine in many cases, and no further refinements need be considered;
+a delivery person could likely decipher this even without being aware of this
+protocol.
 
-For policy RFCs, this section should provide an example-driven introduction to the policy, 
-  and explain its impact in concrete terms.
+However, there are, in all likelihood, addressing restrictions built into
+various websites and databases, which will reject the above based on decimal
+points, or length of numbers, or a mix of letters and numbers. For these cases,
+some variations on this general scheme may be of use.
+
+Getting rid of the decimal point will require fixed-length coordinates, which
+is conceptually simple enough. However, degrees east and west can exceed 100,
+so the tens digit will have to encode for that possibilty. The easiest way
+would be to borrow the hexadecimal digits A through F: my house number above
+would then change from 110.316302W to B0316202W.
+
+Shortening the numbers is more difficult. The 4th decimal place represents 11.1
+meters at the equator, which is far too large a grain for shanty towns or
+tent cities, and chopping the 6th decimal place isn't much of an improvement.
+One possibility would be to use a fixed, known, coordinate set for the city
+center, and have the street address be an offset from that. Yet another
+possibility would be to use one of the various (Geohash)[https://en.wikipedia.org/wiki/Geohash] formats, splitting it into two parts to represent street name
+and number. Such improvements will be explored if they should turn out to
+be necessary.
 
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
