@@ -67,7 +67,7 @@ meters at the equator, which is far too large a grain for shanty towns or
 tent cities, and chopping the 6th decimal place isn't much of an improvement.
 One possibility would be to use a fixed, known, coordinate set for the city
 center, and have the street address be an offset from that. Yet another
-possibility would be to use one of the various (Geohash)[https://en.wikipedia.org/wiki/Geohash] formats, splitting it into two parts to represent street name
+possibility would be to use one of the various [Geohash](https://en.wikipedia.org/wiki/Geohash) formats, splitting it into two parts to represent street name
 and number. Such improvements will be explored if they should turn out to
 be necessary.
 
