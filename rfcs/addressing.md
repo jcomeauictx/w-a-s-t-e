@@ -1,6 +1,6 @@
 - Feature Name: A permissionless, unique, physical addressing scheme
 - Start Date: 2023-02-07
-- RFC PR: [w-a-s-t-e/rfcs](https://github.com/jcomeauictx/w-a-s-t-e/rfcs/addressing_rfc.md)
+- RFC PR: [w-a-s-t-e/rfcs](https://github.com/jcomeauictx/w-a-s-t-e/rfcs/addressing.md)
 - GitHub Issue: [w-a-s-t-e/issues#1](https://github.com/jcomeauictx/w-a-s-t-e/issues/1)
 
 # Summary

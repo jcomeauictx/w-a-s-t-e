@@ -7,4 +7,4 @@ a decentralized, reliable, affordable, delivery system for snailmail and goods.
 
 See [rfcs](rfcs/) for proposals. Add your own by opening an issue and submitting
 a pull request with your RFC. Use the template from the first revision of
-the [addressing rfc](rfcs/addressing_rfc.md).
+the [addressing rfc](rfcs/addressing.md).
