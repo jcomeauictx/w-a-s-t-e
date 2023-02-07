@@ -1,7 +1,7 @@
 - Feature Name: A permissionless, unique, physical addressing scheme
 - Start Date: 2023-02-07
-- RFC PR: [w-a-s-t-e/rfcs#0000](https://github.com/w-a-s-t-e/rfcs/pull/0000)
-- GitHub Issue: [w-a-s-t-e/issues#0000](https://github.com/w-a-s-t-e/issues/0000)
+- RFC PR: [w-a-s-t-e/rfcs](https://github.com/w-a-s-t-e/rfcs/addressing_rfc.md)
+- GitHub Issue: [w-a-s-t-e/issues#1](https://github.com/w-a-s-t-e/issues/1)
 
 # Summary
 [summary]: #summary
