@@ -1,7 +1,7 @@
 - Feature Name: A permissionless, unique, physical addressing scheme
 - Start Date: 2023-02-07
-- RFC PR: [w-a-s-t-e/rfcs](https://github.com/w-a-s-t-e/rfcs/addressing_rfc.md)
-- GitHub Issue: [w-a-s-t-e/issues#1](https://github.com/w-a-s-t-e/issues/1)
+- RFC PR: [w-a-s-t-e/rfcs](https://github.com/jcomeauictx/w-a-s-t-e/rfcs/addressing_rfc.md)
+- GitHub Issue: [w-a-s-t-e/issues#1](https://github.com/jcomeauictx/w-a-s-t-e/issues/1)
 
 # Summary
 [summary]: #summary
@@ -17,7 +17,7 @@ Why are we doing this? What use cases does it support? What is the expected outc
 
 In developing countries, even in relatively advanced areas like La Paz, BCS, Mexico, governments can be glacially slow in assigning street names and numbers.
 
-This situation can make useless delivery addresses such as that of my workshop until a few months ago, when the street was given the name Castro Beltr&aacuten:
+This situation can make useless delivery addresses such as that of my workshop until a few months ago, when the street was given the name Castro Beltrán:
 
     John Comeau
     Calle S/N S/N (sin nombre, "without name", sin numero "without number")
