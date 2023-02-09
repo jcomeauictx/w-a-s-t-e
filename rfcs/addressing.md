@@ -13,8 +13,6 @@ uniqueness.
 # Motivation
 [motivation]: #motivation
 
-Why are we doing this? What use cases does it support? What is the expected outcome?
-
 In developing countries, even in relatively advanced areas like La Paz, BCS, Mexico, governments can be glacially slow in assigning street names and numbers.
 
 This situation can make useless delivery addresses such as that of my workshop until a few months ago, when the street was given the name Castro Beltrán:
@@ -40,10 +38,16 @@ would be the street name, and the E or W component would be the street number.
 Vice versa for an east-west street. Either can be used if the street runs at
 a 45-degree angle from a compass point, or the street runs in all directions.
 
+Precede the "street name" with "GPS" and the direction ('N', 'S', 'E', 'W').
+Use the English direction abbreviations, but use local language for "street",
+"avenue", or "road".
+
+Suffix the direction to the "street number".
+
 Using the same example as above, the improved address would be:
 
     John Comeau
-    Calle 24.067714NGPS 110.316302W (W instead of O for "oeste" for clarity)
+    Calle GPSN24.067714 110.316302W
     Colonia Los Cardones
     La Paz, BCS 23089
 
@@ -74,14 +78,39 @@ be necessary.
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
 
-This is the technical portion of the RFC. Explain the design in sufficient detail that:
+Python code for the simplest form:
 
-- Its interaction with other features is clear.
-- It is reasonably clear how the feature would be implemented.
-- Corner cases are dissected by example.
+```python
+#!/usr/bin/python3
+'''
+Implementation of ideas in the addressing RFC
+'''
 
-The section should return to the examples given in the previous section, 
-and explain more fully how the detailed proposal makes those examples work.
+```python
+def street_address(latitude, longitude, direction, streetword, position):
+    '''
+    first two args are latitude and longitude
+    third arg is the general direction of the street: 'N' for N-S, 'E' for E-W
+    4th arg is the word for 'street'
+    final arg is the position of the word for 'street' in the address.
+
+    >>> street_address(24.067714, -110.316302, 'N', 'Calle', 0)
+    'Calle GPSN24.067714 110.316302W'
+    '''
+    address = ['GPS']
+    if direction == 'N':
+        address[0] += 'S' if latitude < 0 else 'N'
+        address[0] += str(abs(latitude))
+        address.append(str(abs(longitude)))
+        address[1] += 'W' if longitude < 0 else 'E'
+    else:
+        address[0] += 'W' if longitude < 0 else 'E'
+        address[0] += str(abs(longitude))
+        address.append(str(abs(latitude)))
+        address[1] += 'S' if latitude < 0 else 'N'
+    address.insert(position, streetword)
+    return ' '.join(address)
+```
 
 # Drawbacks
 [drawbacks]: #drawbacks
