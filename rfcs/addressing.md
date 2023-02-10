@@ -64,12 +64,12 @@ Getting rid of the decimal point will require fixed-length coordinates, which
 is conceptually simple enough. However, degrees east and west can exceed 100,
 so the tens digit will have to encode for that possibilty. The easiest way
 would be to borrow the hexadecimal digits A through F: my street name above
-would then change from W110.316302 to WB0316202.
+would then change from W110.316302 to WB031630.
 
 Shortening the numbers is more difficult. The 4th decimal place represents 11.1
 meters at the equator, which is far too large a grain for shanty towns or
 tent cities. Chopping the 6th decimal place isn't much of an improvement,
-but should arguably be done: Calle GPSWB031620 2406771N.
+but should arguably be done: Calle GPSWB031630 2406771N.
 
 One possibility would be to use a fixed, known, coordinate set for the city
 center, and have the street address be an offset from that. Yet another
