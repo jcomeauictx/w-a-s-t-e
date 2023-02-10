@@ -33,10 +33,10 @@ addresses would reduce the need for such ad-hoc solutions.
 [guide-level-explanation]: #guide-level-explanation
 
 The simplest solution would use unadorned GPS coordinates as the street name
-and number: if the street runs roughly north and south, the N or S component
-would be the street name, and the E or W component would be the street number.
-Vice versa for an east-west street. Either can be used if the street runs at
-a 45-degree angle from a compass point, or the street runs in all directions.
+and number: if the street runs roughly north and south, the longitude component
+would be the street name, and the latitude component would be the street number.
+Vice versa for an east-west street. Either can be used if the street runs close
+to a 45-degree angle from a compass point, or the street runs in all directions.
 
 Precede the "street name" with "GPS" and the direction ('N', 'S', 'E', 'W').
 Use the English direction abbreviations, but use local language for "street",
@@ -47,7 +47,7 @@ Suffix the direction to the "street number".
 Using the same example as above, the improved address would be:
 
     John Comeau
-    Calle GPSN24.067714 110.316302W
+    Calle GPSW110.316302 24.067714N
     Colonia Los Cardones
     La Paz, BCS 23089
 
@@ -63,12 +63,14 @@ some variations on this general scheme may be of use.
 Getting rid of the decimal point will require fixed-length coordinates, which
 is conceptually simple enough. However, degrees east and west can exceed 100,
 so the tens digit will have to encode for that possibilty. The easiest way
-would be to borrow the hexadecimal digits A through F: my house number above
-would then change from 110.316302W to B0316202W.
+would be to borrow the hexadecimal digits A through F: my street name above
+would then change from W110.316302 to WB0316202.
 
 Shortening the numbers is more difficult. The 4th decimal place represents 11.1
 meters at the equator, which is far too large a grain for shanty towns or
-tent cities, and chopping the 6th decimal place isn't much of an improvement.
+tent cities. Chopping the 6th decimal place isn't much of an improvement,
+but should arguably be done: Calle GPSWB031620 2406771N.
+
 One possibility would be to use a fixed, known, coordinate set for the city
 center, and have the street address be an offset from that. Yet another
 possibility would be to use one of the various [Geohash](https://en.wikipedia.org/wiki/Geohash) formats, splitting it into two parts to represent street name
@@ -87,27 +89,27 @@ Implementation of ideas in the addressing RFC
 '''
 
 ```python
-def street_address(latitude, longitude, direction, streetword, position):
+def format_0(latitude, longitude, direction, streetword, position):
     '''
     first two args are latitude and longitude
     third arg is the general direction of the street: 'N' for N-S, 'E' for E-W
     4th arg is the word for 'street'
     final arg is the position of the word for 'street' in the address.
 
-    >>> street_address(24.067714, -110.316302, 'N', 'Calle', 0)
-    'Calle GPSN24.067714 110.316302W'
+    >>> format_0(24.067714, -110.316302, 'N', 'Calle', 0)
+    'Calle GPSW110.316302 24.067714N'
     '''
     address = ['GPS']
     if direction == 'N':
-        address[0] += 'S' if latitude < 0 else 'N'
-        address[0] += str(abs(latitude))
-        address.append(str(abs(longitude)))
-        address[1] += 'W' if longitude < 0 else 'E'
-    else:
         address[0] += 'W' if longitude < 0 else 'E'
         address[0] += str(abs(longitude))
         address.append(str(abs(latitude)))
         address[1] += 'S' if latitude < 0 else 'N'
+    else:
+        address[0] += 'S' if latitude < 0 else 'N'
+        address[0] += str(abs(latitude))
+        address.append(str(abs(longitude)))
+        address[1] += 'W' if longitude < 0 else 'E'
     address.insert(position, streetword)
     return ' '.join(address)
 ```
@@ -115,58 +117,27 @@ def street_address(latitude, longitude, direction, streetword, position):
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Why should we *not* do this?
+No known drawbacks. Even in developed countries where street names and numbers
+are always assigned before construction, this method could be voluntarily used
+as an alternative.
 
 # Rationale and alternatives
 [rationale-and-alternatives]: #rationale-and-alternatives
 
-- Why is this design the best in the space of possible designs?
-- What other designs have been considered and what is the rationale for not choosing them?
-- What is the impact of not doing this?
+Impact of not doing this is simply to leave ad-hoc solutions as the only
+alternatives.
 
 # Prior art
 [prior-art]: #prior-art
 
-Discuss prior art, both the good and the bad, in relation to this proposal.
-A few examples of what this can include are:
-
-- Does this feature exist in other ML compilers or languages and discuss the experience their community has had?
-- For community proposals: Is this done by some other community and what were their experiences with it?
-- For other teams: What lessons can we learn from what other communities have done here?
-- Papers: Are there any published papers or great posts that discuss this? 
-  If you have some relevant papers to refer to, this can serve as a more detailed theoretical background.
-
-If there is no prior art, that is fine - your ideas are interesting to us whether they are 
-  brand new or if it is an adaptation from other languages.
-
-Note that while precedent set by other languages is some motivation, it does not on its own motivate an RFC.
-Please also take into consideration that TVM intentionally diverges from other compilers.
+[Geohash](https://en.wikipedia.org/wiki/Geohash) could be used as is.
 
 # Unresolved questions
 [unresolved-questions]: #unresolved-questions
 
-- What parts of the design do you expect to resolve through the RFC process before this gets merged?
-- What parts of the design do you expect to resolve through the implementation of this feature before stabilization?
-- What related issues do you consider out of scope for this RFC that could be addressed in the future 
-  independently of the solution that comes out of this RFC?
+All of this is unresolved at this time (2023-02-10).
 
 # Future possibilities
 [future-possibilities]: #future-possibilities
 
-Think about what the natural extension and evolution of your proposal would
-be and how it would affect the language and project as a whole in a holistic
-way. Try to use this section as a tool to more fully consider all possible
-interactions with the project and language in your proposal.
-Also consider how this all fits into the roadmap for the project
-and of the relevant sub-team.
-
-This is also a good place to "dump ideas", if they are out of scope for the
-RFC you are writing but otherwise related.
-
-If you have tried and cannot think of any future possibilities,
-you may simply state that you cannot think of anything.
-
-Note that having something written down in the future-possibilities section
-is not a reason to accept the current or a future RFC; such notes should be
-in the section on motivation or rationale in this or subsequent RFCs.
-The section merely provides additional information.
+Nothing considered at the moment (2023-02-10).
