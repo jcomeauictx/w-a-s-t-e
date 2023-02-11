@@ -44,17 +44,16 @@ class Encoders():
         intermediate = Encoders.format_0(latitude, longitude, direction,
                                          streetword, position).split()
         intermediate.pop(position)
-        street, number = intermediate[0][4:], intermediate[1][:-1]
-        if float(street) >= 100:
-            street = 'ABCDEF'[(int(float(street)) // 10) - 10] + street[2:]
-        street = street.replace('.', '')[:-1]  # get rid of decimal point
-        street = intermediate[0][0:4] + street
-        # and final digit
-        if float(number) >= 100:
-            number = 'ABCDEF'[(int(float(street)) // 10) - 10] + number[2:]
-        number = number.replace('.', '')[:-1]  # get rid of decimal point
-        number += intermediate[1][-1]
-        # and final digit
+        street = round(float(intermediate[0][4:]), 5)
+        number = round(float(intermediate[1][:-1]), 5)
+        if street >= 100:
+            street = 'ABCDEF'[(int(street) // 10) - 10] + str(street)[2:]
+        street = str(street).replace('.', '')  # get rid of decimal point
+        street = intermediate[0][0:4] + street.ljust(7, '0')
+        if number >= 100:
+            number = 'ABCDEF'[(int(street) // 10) - 10] + str(number)[2:]
+        number = str(number).replace('.', '')  # get rid of decimal point
+        number = number.ljust(7, '0') + intermediate[1][-1]
         final = [street, number]
         final.insert(position, streetword)
         return ' '.join(final)
@@ -62,14 +61,14 @@ class Encoders():
 class Decoders():
     '''
     decoding the various formats back into raw GPS coordinates
-
-    >>> Decoders.format_0('Calle GPSW110.316302 24.067714N', 'Calle')
-    (24.067714, -110.316302, 'N', 'Calle', 0)
     '''
     @staticmethod
     def format_0(address, streetword):
         '''
         reconstruct and return args for encode.format0(...)
+
+        >>> Decoders.format_0('Calle GPSW110.316302 24.067714N', 'Calle')
+        (24.067714, -110.316302, 'N', 'Calle', 0)
         '''
         parts = address.split()
         position = parts.index(streetword)
@@ -88,3 +87,17 @@ class Decoders():
             longitude = float(second) * (-1 if easting == 'W' else 1)
             latitude = float(first) * (-1 if northing == 'S' else 1)
         return (latitude, longitude, direction, streetword, position)
+
+    @staticmethod
+    def format_1(address, streetword):
+        '''
+        reconstruct and return args for decode.format1(...)
+
+        except that latitude and longitude will only have 5 digit precision
+
+        >>> Decoders.format_1('Calle GPSWB031630 2406771N', 'Calle')
+        'Calle GPSWB031630 2406771N'
+        (24.067714, -110.316302, 'N', 'Calle', 0)
+        '''
+        intermediate = Decoders.format_0(address, streetword)
+        return intermediate
