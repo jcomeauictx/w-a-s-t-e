@@ -42,17 +42,19 @@ class Encoders():
         'Calle GPSWB031630 2406771N'
         '''
         intermediate = Encoders.format_0(latitude, longitude, direction,
-                                streetword, position).split()
+                                         streetword, position).split()
         intermediate.pop(position)
         street, number = intermediate[0][4:], intermediate[1][:-1]
         if float(street) >= 100:
             street = 'ABCDEF'[(int(float(street)) // 10) - 10] + street[2:]
-            street = street.replace('.', '')[:-1]  # get rid of decimal point
-            # and final digit
+        street = street.replace('.', '')[:-1]  # get rid of decimal point
+        street = intermediate[0][0:4] + street
+        # and final digit
         if float(number) >= 100:
             number = 'ABCDEF'[(int(float(street)) // 10) - 10] + number[2:]
-            number = number.replace('.', '')[:-1]  # get rid of decimal point
-            # and final digit
+        number = number.replace('.', '')[:-1]  # get rid of decimal point
+        number += intermediate[1][-1]
+        # and final digit
         final = [street, number]
         final.insert(position, streetword)
         return ' '.join(final)
