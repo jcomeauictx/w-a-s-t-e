@@ -33,6 +33,30 @@ class Encoders():
         address.insert(position, streetword)
         return ' '.join(address)
 
+    @staticmethod
+    def format_1(latitude, longitude, direction, streetword, position):
+        '''
+        See format_0 docstring
+
+        >>> Encoders.format_1(24.067714, -110.316302, 'N', 'Calle', 0)
+        'Calle GPSWB031630 2406771N'
+        '''
+        intermediate = Encoders.format_0(latitude, longitude, direction,
+                                streetword, position).split()
+        intermediate.pop(position)
+        street, number = intermediate[0][4:], intermediate[1][:-1]
+        if float(street) >= 100:
+            street = 'ABCDEF'[(int(float(street)) // 10) - 10] + street[2:]
+            street = street.replace('.', '')[:-1]  # get rid of decimal point
+            # and final digit
+        if float(number) >= 100:
+            number = 'ABCDEF'[(int(float(street)) // 10) - 10] + number[2:]
+            number = number.replace('.', '')[:-1]  # get rid of decimal point
+            # and final digit
+        final = [street, number]
+        final.insert(position, streetword)
+        return ' '.join(final)
+
 class Decoders():
     '''
     decoding the various formats back into raw GPS coordinates
