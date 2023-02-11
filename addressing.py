@@ -7,6 +7,7 @@ class Encoders():
     '''
     encoding formats for distributed addressing
     '''
+    @staticmethod
     def format_0(latitude, longitude, direction, streetword, position):
         '''
         first two args are latitude and longitude
@@ -39,6 +40,7 @@ class Decoders():
     >>> Decoders.format_0('Calle GPSW110.316302 24.067714N', 'Calle')
     (24.067714, -110.316302, 'N', 'Calle', 0)
     '''
+    @staticmethod
     def format_0(address, streetword):
         '''
         reconstruct and return args for encode.format0(...)
