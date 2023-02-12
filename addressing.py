@@ -96,8 +96,32 @@ class Decoders():
         except that latitude and longitude will only have 5 digit precision
 
         >>> Decoders.format_1('Calle GPSWB031630 2406771N', 'Calle')
-        'Calle GPSWB031630 2406771N'
-        (24.067714, -110.316302, 'N', 'Calle', 0)
+        (24.06771, -110.3163, 'N', 'Calle', 0)
         '''
-        intermediate = Decoders.format_0(address, streetword)
-        return intermediate
+        parts = address.split()
+        position = parts.index(streetword)
+        parts.pop(position)
+        first = parts[0][3:]
+        if first.startswith(('E', 'W')):
+            direction = 'N'
+            easting, first = first[0], first[1:]
+            northing, second = parts[1][-1], parts[1][:-1]
+            if first.startswith(tuple('ABCDEF')):
+                first = str('ABCDEF'.index(first[0]) + 10) + first[1:]
+            if second.startswith(tuple('ABCDEF')):
+                second = str('ABCDEF'.index(second[0]) + 10) + second[1:]
+            longitude = float(first) * (-1 if easting == 'W' else 1)
+            latitude = float(second) * (-1 if northing == 'S' else 1)
+        else:
+            direction = 'E'
+            northing, first = first[0], first[1:]
+            easting, second = parts[1][-1], parts[1][:-1]
+            if first.startswith(tuple('ABCDEF')):
+                first = str('ABCDEF'.index(first[0]) + 10) + first[1:]
+            if second.startswith(tuple('ABCDEF')):
+                second = str('ABCDEF'.index(second[0]) + 10) + second[1:]
+            longitude = float(second) * (-1 if easting == 'W' else 1)
+            latitude = float(first) * (-1 if northing == 'S' else 1)
+        longitude /= 100000
+        latitude /= 100000
+        return (latitude, longitude, direction, streetword, position)
