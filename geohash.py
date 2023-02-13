@@ -18,25 +18,30 @@ def encode(latitude, longitude, max_error = .00001):
 
     see //en.wikipedia.org/wiki/Geohash, //geohash.org/
 
-    >>> encode(42.605, -5.603)
+    >>> encode(42.605, -5.603, .001)
     'ezs42'
     '''
-    latitude_range = [-90, 90]
+    spread = [[-90, 90], [-180, 180]]
+    given = (latitude, longitude)
     bitstring = ''
     error = sys.maxsize
-    while True:
-        middle = mean(latitude_range)
-        error = abs(middle - latitude_range[1])
-        if error <= max_error:
-            break
-        if latitude >= middle:
-            latitude_range = [middle, latitude_range[1]]
-            bitstring += '1'
-        else:
-            latitude_range = [latitude_range[0], middle]
-            bitstring += '0'
-        logging.debug('latitude: %s, range: %s: error: %s',
-                      latitude, latitude_range, error)
+    while error > max_error:
+        # start with longitude. latitude can be truncated.
+        for index in (1, 0):
+            middle = mean(spread[index])
+            error = abs(middle - spread[index][1])
+            if error <= max_error:
+                logging.info('error %s < max_error %s', error, max_error)
+                break
+            if given[index] >= middle:
+                spread[index] = [middle, spread[index][1]]
+                bitstring += '1'
+            else:
+                spread[index] = [spread[index][0], middle]
+                bitstring += '0'
+            logging.debug('%s: %s, range: %s: error: %s',
+                          ['latitude', 'longitude'][index], given[index],
+                          spread[index], error)
     logging.debug('final: error=%s, bitstring=%s', error, bitstring)
     return bitstring
 
