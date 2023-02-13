@@ -13,15 +13,15 @@ logging.basicConfig(level=logging.DEBUG if __debug__ else logging.WARN)
 ALPHABET = '0123456789bcdefghjkmnpqrstuvwxyz'
 BITS = (len(ALPHABET) - 1).bit_length()  # bits per character
 
-def encode(latitude, longitude, max_error = .00001):
+def encode(latitude, longitude, max_error=.00001):
     '''
     encode latitude and longitude into Geohash format
 
     I didn't actually see an explanation of this, just figured it out from
     the decode example.
 
-    >>> encode(42.605, -5.603, .042)
-    'ezs42'
+    >>> encode(42.605, -5.603, .0001)
+    'ezs42s'
     '''
     spread = [[-90, 90], [-180, 180]]
     given = (latitude, longitude)
@@ -49,7 +49,7 @@ def encode(latitude, longitude, max_error = .00001):
     geohash = ''
     for index in range(0, len(bitstring), 5):
         geohash += ALPHABET[int(bitstring[index:index + 5], 2)]
-    return geohash
+    return geohash.rstrip('0')
 
 def decode(geohash):
     '''
