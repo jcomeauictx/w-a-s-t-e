@@ -5,18 +5,40 @@ implementing Gustavo Niemeyer's geohash from Wikipedia article
 geohash.org website isn't fully functional, and anyway I may need to base
 a better addressing scheme on this method.
 '''
+import sys
 import logging
 
 logging.basicConfig(level=logging.DEBUG if __debug__ else logging.WARN)
 
 ALPHABET = '0123456789bcdefghjkmnpqrstuvwxyz'
 
-def encode(latitude, longitude):
+def encode(latitude, longitude, max_error = .00001):
     '''
     encode latitude and longitude into Geohash format
 
     see //en.wikipedia.org/wiki/Geohash, //geohash.org/
+
+    >>> encode(42.605, -5.603)
+    'ezs42'
     '''
+    latitude_range = [-90, 90]
+    bitstring = ''
+    error = sys.maxsize
+    while True:
+        middle = mean(latitude_range)
+        error = abs(middle - latitude_range[1])
+        if error <= max_error:
+            break
+        if latitude >= middle:
+            latitude_range = [middle, latitude_range[1]]
+            bitstring += '1'
+        else:
+            latitude_range = [latitude_range[0], middle]
+            bitstring += '0'
+        logging.debug('latitude: %s, range: %s: error: %s',
+                      latitude, latitude_range, error)
+    logging.debug('final: error=%s, bitstring=%s', error, bitstring)
+    return bitstring
 
 def decode(geohash):
     '''
@@ -31,7 +53,6 @@ def decode(geohash):
     logging.debug('binary: %s', binary)
     # binary string is longitude bits alternating with latitude
     latitude, longitude = [-90, 90], [-180, 180]
-    mean = lambda range: (range[0] + range[1]) / 2
     for index in range(0, len(binary), 2):
         # first do longitude
         digit = int(binary[index])
@@ -47,3 +68,9 @@ def decode(geohash):
         except IndexError:  # odd number of binary digits
             pass
     return mean(latitude), mean(longitude)
+
+def mean(numeric_array):
+    '''
+    calculate arithmetic mean
+    '''
+    return sum(numeric_array) / len(numeric_array)
