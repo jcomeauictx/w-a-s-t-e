@@ -69,20 +69,24 @@ def decode(geohash):
     logging.debug('binary: %s', binary)
     # binary string is longitude bits alternating with latitude
     latitude, longitude = [-90, 90], [-180, 180]
+    error = [90, 180]
     for index in range(0, len(binary), 2):
         # first do longitude
         digit = int(binary[index])
         middle = mean(longitude)
         longitude = ([longitude[0], middle], [middle, longitude[1]])[digit]
+        error[1] /= 2
         logging.debug('digit: %s, longitude: %s', digit, longitude)
         # now latitude
         try:
             digit = int(binary[index + 1])
             middle = mean(latitude)
             latitude = ([latitude[0], middle], [middle, latitude[1]])[digit]
+            error[0] /= 2
             logging.debug('digit: %s, latitude: %s', digit, latitude)
         except IndexError:  # odd number of binary digits
             pass
+    logging.debug('max error (lat/lon): %s', error)
     return mean(latitude), mean(longitude)
 
 def mean(numeric_array, digits=6, final_round=False):
