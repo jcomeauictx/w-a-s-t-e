@@ -69,7 +69,7 @@ def decode(geohash):
     logging.debug('binary: %s', binary)
     # binary string is longitude bits alternating with latitude
     latitude, longitude = [-90, 90], [-180, 180]
-    error = [90, 180]
+    error = [mean(latitude) + latitude[1], mean(longitude) + longitude[1]]
     for index in range(0, len(binary), 2):
         # first do longitude
         digit = int(binary[index])
