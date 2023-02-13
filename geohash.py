@@ -85,11 +85,25 @@ def decode(geohash):
             pass
     return mean(latitude), mean(longitude)
 
-def mean(numeric_array):
+def mean(numeric_array, digits=6, final_round=False):
     '''
     calculate arithmetic mean
+
+    see notes on 'final rounding' in Wikipedia article
+
+    >>> mean([42.583, 42.627], 0, True)
+    42.6
     '''
-    return sum(numeric_array) / len(numeric_array)
+    average = sum(numeric_array) / len(numeric_array)
+    if final_round:
+        # this part assumes an array of length 2!
+        truncated = sys.maxsize
+        digits -= 1
+        while not numeric_array[0] < truncated < numeric_array[1]:
+            digits += 1
+            truncated = round(average, digits)
+        average = truncated
+    return average
 
 def bit_length(alphabet):
     '''
