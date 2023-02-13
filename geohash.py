@@ -11,9 +11,8 @@ import logging
 logging.basicConfig(level=logging.DEBUG if __debug__ else logging.WARN)
 
 ALPHABET = '0123456789bcdefghjkmnpqrstuvwxyz'
-BITS = (len(ALPHABET) - 1).bit_length()  # bits per character
 
-def encode(latitude, longitude, max_error=.00001):
+def encode(latitude, longitude, max_error=.00001, alphabet=ALPHABET):
     '''
     encode latitude and longitude into Geohash format
 
@@ -23,6 +22,7 @@ def encode(latitude, longitude, max_error=.00001):
     >>> encode(42.605, -5.603, .0001)
     'ezs42s'
     '''
+    bits = bit_length(alphabet)  # for padding bitstring
     spread = [[-90, 90], [-180, 180]]
     given = (latitude, longitude)
     bitstring = ''
@@ -45,10 +45,13 @@ def encode(latitude, longitude, max_error=.00001):
                           ['latitude', 'longitude'][index], given[index],
                           spread[index], error)
     logging.debug('final: error=%s, bitstring=%s', error, bitstring)
-    bitstring += '0' * (BITS - (len(bitstring) % BITS))
+    padding = '0' * (bits - (len(bitstring) % bits))
+    logging.debug('padding bitstring with %r', padding)
+    bitstring += padding
+    logging.debug('bitstring length: %s', len(bitstring))
     geohash = ''
     for index in range(0, len(bitstring), 5):
-        geohash += ALPHABET[int(bitstring[index:index + 5], 2)]
+        geohash += alphabet[int(bitstring[index:index + 5], 2)]
     return geohash.rstrip('0')
 
 def decode(geohash):
@@ -87,3 +90,9 @@ def mean(numeric_array):
     calculate arithmetic mean
     '''
     return sum(numeric_array) / len(numeric_array)
+
+def bit_length(alphabet):
+    '''
+    max bit length represented by the alphabet in use
+    '''
+    return (len(alphabet) - 1).bit_length()  # bits per character
