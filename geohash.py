@@ -11,14 +11,16 @@ import logging
 logging.basicConfig(level=logging.DEBUG if __debug__ else logging.WARN)
 
 ALPHABET = '0123456789bcdefghjkmnpqrstuvwxyz'
+BITS = (len(ALPHABET) - 1).bit_length()  # bits per character
 
 def encode(latitude, longitude, max_error = .00001):
     '''
     encode latitude and longitude into Geohash format
 
-    see //en.wikipedia.org/wiki/Geohash, //geohash.org/
+    I didn't actually see an explanation of this, just figured it out from
+    the decode example.
 
-    >>> encode(42.605, -5.603, .001)
+    >>> encode(42.605, -5.603, .042)
     'ezs42'
     '''
     spread = [[-90, 90], [-180, 180]]
@@ -43,11 +45,17 @@ def encode(latitude, longitude, max_error = .00001):
                           ['latitude', 'longitude'][index], given[index],
                           spread[index], error)
     logging.debug('final: error=%s, bitstring=%s', error, bitstring)
-    return bitstring
+    bitstring += '0' * (BITS - (len(bitstring) % BITS))
+    geohash = ''
+    for index in range(0, len(bitstring), 5):
+        geohash += ALPHABET[int(bitstring[index:index + 5], 2)]
+    return geohash
 
 def decode(geohash):
     '''
     decode geohash into latitude and longitude
+
+    see //en.wikipedia.org/wiki/Geohash, //geohash.org/
 
     >>> decode('ezs42')  # from wikipedia example
     (42.60498046875, -5.60302734375)
