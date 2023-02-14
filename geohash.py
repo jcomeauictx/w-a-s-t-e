@@ -12,29 +12,29 @@ logging.basicConfig(level=logging.DEBUG if __debug__ else logging.WARN)
 
 ALPHABET = '0123456789bcdefghjkmnpqrstuvwxyz'
 
-def encode(latitude, longitude, max_error=.00001, alphabet=ALPHABET):
+def encode(latitude, longitude, max_error=.00001, alphabet=ALPHABET,
+           prefer_odd=False):
     '''
     encode latitude and longitude into Geohash format
 
     I didn't actually see an explanation of this, just figured it out from
     the decode example.
 
-    >>> encode(42.605, -5.603, .0001)
-    'ezs42s'
+    `prefer_odd` will return an odd-length geohash if allowed by max_error
+
+    >>> encode(42.605, -5.603, .03, prefer_odd=True)
+    'ezs42'
     '''
     bits = bit_length(alphabet)  # for padding bitstring
     spread = [[-90, 90], [-180, 180]]
     given = (latitude, longitude)
     bitstring = ''
-    error = sys.maxsize
-    while error > max_error:
+    error = [sys.maxsize, sys.maxsize]
+    while error[1] > max_error:
         # start with longitude. latitude can be truncated.
         for index in (1, 0):
             middle = mean(spread[index])
-            error = abs(middle - spread[index][1])
-            if error <= max_error:
-                logging.info('error %s < max_error %s', error, max_error)
-                break
+            error[index] = abs(middle - spread[index][1])
             if given[index] >= middle:
                 spread[index] = [middle, spread[index][1]]
                 bitstring += '1'
@@ -45,6 +45,8 @@ def encode(latitude, longitude, max_error=.00001, alphabet=ALPHABET):
                           ['latitude', 'longitude'][index], given[index],
                           spread[index], error)
     logging.debug('final: error=%s, bitstring=%s', error, bitstring)
+    if error[0] > max_error:
+        raise ValueError('latitude too imprecise for max_error')
     padding = '0' * (bits - (len(bitstring) % bits))
     logging.debug('padding bitstring with %r', padding)
     bitstring += padding
@@ -52,9 +54,13 @@ def encode(latitude, longitude, max_error=.00001, alphabet=ALPHABET):
     geohash = ''
     for index in range(0, len(bitstring), 5):
         geohash += alphabet[int(bitstring[index:index + 5], 2)]
-    return geohash.rstrip('0')
+    if prefer_odd and not len(geohash) % 2:
+        check = decode(geohash[:-1], return_error=True)
+        if check[0] <= max_error:
+            geohash = geohash[:-1]
+    return geohash
 
-def decode(geohash):
+def decode(geohash, return_error=False):
     '''
     decode geohash into latitude and longitude
 
@@ -87,7 +93,7 @@ def decode(geohash):
         except IndexError:  # odd number of binary digits
             pass
     logging.debug('max error (lat/lon): %s', error)
-    return mean(latitude), mean(longitude)
+    return error if return_error else (mean(latitude), mean(longitude))
 
 def mean(numeric_array, digits=6, final_round=False):
     '''
