@@ -30,7 +30,6 @@ def encode(latitude, longitude, error_override=None, alphabet=ALPHABET,
     >>> encode(42.605, -5.603, .03, prefer_odd=True)
     'ezs42'
     '''
-    bits = bit_length(alphabet)  # for padding bitstring
     spread = [[-90, 90], [-180, 180]]
     given, max_error = normalize(latitude, longitude)
     if error_override is not None:
@@ -54,9 +53,7 @@ def encode(latitude, longitude, error_override=None, alphabet=ALPHABET,
     logging.debug('final: error=%s, bitstring=%s', error, bitstring)
     if error[0] > max_error[0]:
         raise ValueError('latitude too imprecise for max_error')
-    padding = '0' * (bits - (len(bitstring) % bits))
-    logging.debug('padding bitstring with %r', padding)
-    bitstring += padding
+    bitstring = pad(bitstring, alphabet)
     logging.debug('bitstring length: %s', len(bitstring))
     geohash = ''
     for index in range(0, len(bitstring), 5):
@@ -127,6 +124,20 @@ def bit_length(alphabet):
     max bit length represented by the alphabet in use
     '''
     return (len(alphabet) - 1).bit_length()  # bits per character
+
+def pad(bitstring, alphabet):
+    '''
+    make sure bitstring is in exact multiple of the alphabet bit_length
+
+    >>> pad('01010', ALPHABET)
+    '01010'
+    >>> pad('01', ALPHABET)
+    '01000'
+    '''
+    bits = bit_length(alphabet)  # for padding bitstring
+    padding = '0' * ((bits - (len(bitstring) % bits)) % bits)
+    logging.debug('padding bitstring with %r', padding)
+    return bitstring + padding
 
 def normalize(latitude, longitude):
     '''
