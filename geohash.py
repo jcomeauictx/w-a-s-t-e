@@ -12,13 +12,18 @@ logging.basicConfig(level=logging.DEBUG if __debug__ else logging.WARN)
 
 ALPHABET = '0123456789bcdefghjkmnpqrstuvwxyz'
 
-def encode(latitude, longitude, max_error=.00001, alphabet=ALPHABET,
+def encode(latitude, longitude, error_override=None, alphabet=ALPHABET,
            prefer_odd=False):
     '''
     encode latitude and longitude into Geohash format
 
     I didn't actually see an explanation of this, just figured it out from
     the decode example.
+
+    latitude and longitude can be provided as strings or floats.
+
+    max_error is calculated from number of digits of precision, but if
+    `error_override` is provided, it is used for both latitude and longitude.
 
     `prefer_odd` will return an odd-length geohash if allowed by max_error
 
@@ -27,10 +32,12 @@ def encode(latitude, longitude, max_error=.00001, alphabet=ALPHABET,
     '''
     bits = bit_length(alphabet)  # for padding bitstring
     spread = [[-90, 90], [-180, 180]]
-    given = (latitude, longitude)
+    given, max_error = normalize(latitude, longitude)
+    if error_override is not None:
+        max_error = (float(error_override), float(error_override))
     bitstring = ''
     error = [sys.maxsize, sys.maxsize]
-    while error[1] > max_error:
+    while error[1] > max_error[1]:
         # start with longitude. latitude can be truncated.
         for index in (1, 0):
             middle = mean(spread[index])
@@ -45,7 +52,7 @@ def encode(latitude, longitude, max_error=.00001, alphabet=ALPHABET,
                           ['latitude', 'longitude'][index], given[index],
                           spread[index], error)
     logging.debug('final: error=%s, bitstring=%s', error, bitstring)
-    if error[0] > max_error:
+    if error[0] > max_error[0]:
         raise ValueError('latitude too imprecise for max_error')
     padding = '0' * (bits - (len(bitstring) % bits))
     logging.debug('padding bitstring with %r', padding)
@@ -56,7 +63,7 @@ def encode(latitude, longitude, max_error=.00001, alphabet=ALPHABET,
         geohash += alphabet[int(bitstring[index:index + 5], 2)]
     if prefer_odd and not len(geohash) % 2:
         check = decode(geohash[:-1], return_error=True)
-        if check[0] <= max_error:
+        if check[0] <= max_error[0]:
             geohash = geohash[:-1]
     return geohash
 
@@ -120,3 +127,37 @@ def bit_length(alphabet):
     max bit length represented by the alphabet in use
     '''
     return (len(alphabet) - 1).bit_length()  # bits per character
+
+def normalize(latitude, longitude):
+    '''
+    determine max_error for latitude and longitude
+    return both as floats in a tuple, same for max_error
+
+    rationale: let's say longitude is provided as 42.605; this should
+    have been rounded down from just under 42.6055 or less, or rounded up
+    from 42.6045 or more. so the error is plus or minus 0.0005.
+
+    latitude and longitude may have been provided as strings, if from the
+    command line or from a foreign script, or as floats. we assume either,
+    and convert in all cases.
+
+    >>> normalize(43, -6)
+    ((43.0, -6.0), (0.5, 0.5))
+
+    >>> normalize('42.605', '-5.603')
+    ((42.605, -5.603), (0.0005, 0.0005))
+    '''
+    latitude, longitude = str(latitude), str(longitude)
+    max_error = (error_calculation(latitude), error_calculation(longitude))
+    return (float(latitude), float(longitude)), max_error
+
+def error_calculation(numeric_string):
+    '''
+    see docstring for `normalize`.
+    '''
+    dot = numeric_string.rfind('.')
+    if dot != -1:
+        error = 0.5 * (10 ** -(len(numeric_string) - (dot + 1)))
+    else:
+        error = 0.5  # no dot in number at all
+    return error
