@@ -59,8 +59,9 @@ def encode(latitude, longitude, error_override=None, alphabet=ALPHABET,
     for index in range(0, len(bitstring), 5):
         geohash += alphabet[int(bitstring[index:index + 5], 2)]
     if prefer_odd and not len(geohash) % 2:
+        # chopping a character will affect error of both lat and lon
         check = decode(geohash[:-1], return_error=True)
-        if check[0] <= max_error[0]:
+        if check[0] <= max_error[0] and check[1] <= max_error[1]:
             geohash = geohash[:-1]
     return geohash
 
