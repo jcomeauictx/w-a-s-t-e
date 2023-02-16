@@ -6,6 +6,7 @@ geohash.org website isn't fully functional, and anyway I may need to base
 a better addressing scheme on this method.
 '''
 import sys
+import re
 import logging
 
 logging.basicConfig(level=logging.DEBUG if __debug__ else logging.WARN)
@@ -173,3 +174,30 @@ def error_calculation(numeric_string):
     else:
         error = 0.5  # no dot in number at all
     return error
+
+def significant_digits(error):
+    '''
+    calculate significant digits from the maximum error
+
+    only designed to work with errors < 1
+    simplistic approach only counts significant the digits with a zero
+    in the error.
+
+    >>> significant_digits(.022)
+    1
+    >>> significant_digits(.01010)
+    1
+    >>> significant_digits(.1)
+    0
+    >>> significant_digits(10)
+    0
+    '''
+    digits = 0
+    if error * 10 < 1:
+        error = str(error)
+        match = re.search(r'\.(0+)', error)
+        if not match:
+            raise ValueError('Strange error value %s' % error)
+        else:
+            digits = len(match.group(1))
+    return digits
