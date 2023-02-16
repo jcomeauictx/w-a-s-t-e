@@ -73,7 +73,7 @@ def decode(geohash, return_error=False):
     see //en.wikipedia.org/wiki/Geohash, //geohash.org/
 
     >>> decode('ezs42')  # from wikipedia example
-    (42.60498046875, -5.60302734375)
+    (42.6, -5.6)
     '''
     binary = ''
     for character in geohash:
@@ -99,7 +99,12 @@ def decode(geohash, return_error=False):
         except IndexError:  # odd number of binary digits
             pass
     logging.debug('max error (lat/lon): %s', error)
-    return error if return_error else (mean(latitude), mean(longitude))
+    if return_error:
+        return error
+    digits = (significant_digits(error[0]), significant_digits(error[1]))
+    latitude = mean(latitude, digits[0], final_round=True)
+    longitude = mean(longitude, digits[1], final_round=True)
+    return (latitude, longitude)
 
 def mean(numeric_array, digits=6, final_round=False):
     '''
