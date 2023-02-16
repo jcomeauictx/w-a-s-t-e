@@ -2,6 +2,13 @@
 '''
 Implementation of ideas in the addressing RFC
 '''
+import logging
+from geohash import encode as geohash_encode, decode as geohash_decode
+
+CONSONANTS = list('bcdfghjklmnpqrstvwxyz')
+VOWELS = list('aeiou')
+ALPHABET = [c + v for c in CONSONANTS for v in VOWELS]
+logging.debug('alphabet: %s, length: %s', ALPHABET, len(ALPHABET))
 
 class Encoders():
     '''
@@ -57,6 +64,14 @@ class Encoders():
         final = [street, number]
         final.insert(position, streetword)
         return ' '.join(final)
+
+    @staticmethod
+    def format2(latitude, longitude):
+        '''
+        encode geohash address
+        '''
+        string, number = address.split()
+        return (geohash_decode(string), number)
 
 class Decoders():
     '''
@@ -125,3 +140,13 @@ class Decoders():
         longitude /= 100000
         latitude /= 100000
         return (latitude, longitude, direction, streetword, position)
+
+    @staticmethod
+    def format2(address, alphabet=ALPHABET):
+        '''
+        decode geohash address
+
+        >>> Decoders.format2('petaluma 1')
+        '''
+        string, number = address.split()
+        return (geohash_decode(string, alphabet=alphabet), number)

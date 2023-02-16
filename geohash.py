@@ -66,7 +66,7 @@ def encode(latitude, longitude, error_override=None, alphabet=ALPHABET,
             geohash = geohash[:-1]
     return geohash
 
-def decode(geohash, return_error=False):
+def decode(geohash, alphabet=ALPHABET, return_error=False):
     '''
     decode geohash into latitude and longitude
 
@@ -75,9 +75,10 @@ def decode(geohash, return_error=False):
     >>> decode('ezs42')  # from wikipedia example
     (42.6, -5.6)
     '''
+    bits = bit_length(alphabet)  # for padding bitstring
     binary = ''
     for character in geohash:
-        binary += bin(ALPHABET.index(character))[2:].rjust(5, '0')
+        binary += bin(alphabet.index(character))[2:].rjust(bits, '0')
     logging.debug('binary: %s', binary)
     # binary string is longitude bits alternating with latitude
     latitude, longitude = [-90, 90], [-180, 180]
