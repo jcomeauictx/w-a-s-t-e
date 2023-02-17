@@ -10,8 +10,7 @@ CONSONANTS = list('bcdfghjklmnprstvwxyz')
 CONSONANTS += [
     'bl', 'br', 'ch', 'dr', 'fl', 'fr', 'gl', 'gr', 'll', 'pl', 'pr', 'zh'
 ]
-VOWELS = list('aeiou')
-VOWELS += ['ae', 'ai', 'oa']
+VOWELS = ['ae', 'ai', 'oa'] + list('aeiou')
 ALPHABET = [c + v for c in CONSONANTS for v in VOWELS]
 REPLACE = (('llae', 'qua'), ('llai', 'que'), ('lloa', 'qui'), ('groa', 'quo'))
 for _ in dict(REPLACE):
@@ -78,8 +77,8 @@ class Encoders():
         '''
         encode geohash address
 
-        >>> Encoders.format_2(65.15, -129.36)
-        'petalumawa'
+        >>> Encoders.format_2(77.15, -127.86)
+        'petalumawae'
         '''
         return geohash_encode(latitude, longitude, alphabet=ALPHABET)
 
@@ -156,9 +155,9 @@ class Decoders():
         '''
         decode geohash address
 
-        # this turns out to be on Innetalling Island in the Hudson Bay!
+        # this turns out to be in the north Atlantic off Prince Patrick Island!
         >>> Decoders.format_2('petaluma 1')
-        ((65.15, -129.36), '1')
+        ((77.15, -127.86), '1')
         '''
         string, number = address.split()
         return (geohash_decode(string, alphabet=alphabet), number)
