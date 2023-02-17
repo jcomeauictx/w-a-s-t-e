@@ -159,6 +159,7 @@ class Decoders():
         >>> Decoders.format_2('petaluma')
         ((77.15, -127.86), '1')
         '''
+        address = address.lower()
         try:
             string, number = address.split()
             return (geohash_decode(string, alphabet=alphabet), number)
