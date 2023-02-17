@@ -209,10 +209,10 @@ def significant_digits(error):
     '''
     digits = 0
     if error * 10 < 1:
+        # pylint: disable=consider-using-f-string
         error = '%.12f' % error
         match = re.search(r'\.(0+)', error)
         if not match:
             raise ValueError('Strange error value %s' % error)
-        else:
-            digits = len(match.group(1))
+        digits = len(match.group(1))
     return digits

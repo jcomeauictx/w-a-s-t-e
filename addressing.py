@@ -157,7 +157,7 @@ class Decoders():
 
         # this turns out to be in the north Atlantic off Prince Patrick Island!
         >>> Decoders.format_2('petaluma')
-        ((77.15, -127.86), '1')
+        (77.15, -127.86)
         '''
         address = address.lower()
         try:
