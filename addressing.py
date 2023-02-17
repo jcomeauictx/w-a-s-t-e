@@ -2,6 +2,7 @@
 '''
 Implementation of ideas in the addressing RFC
 '''
+import  sys
 import logging
 from geohash import encode as geohash_encode, decode as geohash_decode
 
@@ -161,3 +162,16 @@ class Decoders():
         '''
         string, number = address.split()
         return (geohash_decode(string, alphabet=alphabet), number)
+
+if __name__ == '__main__':
+    ARGS = sys.argv[1:]
+    # pylint: disable=no-value-for-parameter
+    if ARGS:
+        if ARGS[0] == 'encode':
+            print(Encoders.format_2(*ARGS[1:]))
+        elif ARGS[0] == 'decode':
+            print(Decoders.format_2(*ARGS[1:]))
+        else:
+            logging.error('Must specify "encode" or "decode"')
+    else:
+        logging.error('Nothing to do')
