@@ -61,6 +61,7 @@ def encode(latitude, longitude, error_override=None, alphabet=ALPHABET,
         geohash += [alphabet[int(bitstring[index:index + 5], 2)]]
     if prefer_odd and not len(geohash) % 2:
         # chopping a character will affect error of both lat and lon
+        logging.debug('checking error of odd geohash %s', geohash[:-1])
         check = decode(geohash[:-1], return_error=True)
         if check[0] <= max_error[0] and check[1] <= max_error[1]:
             geohash = geohash[:-1]
@@ -80,8 +81,9 @@ def decode(geohash, alphabet=ALPHABET, return_error=False):
     if str(alphabet) == alphabet:  # checking we have a normal alphabet
         split = list  # if so, easy to split geohash into pieces
     else:
-        split = re.compile('^(?:' + '|'.join(alphabet) + ')').findall
-    geohash = split(geohash)
+        split = re.compile('(?:' + '|'.join(alphabet) + ')').findall
+    logging.debug('pre-split geohash: %s', geohash)
+    geohash = [piece.lower() for piece in split(geohash)]
     logging.debug('split geohash: %s', geohash)
     for character in geohash:
         binary += bin(alphabet.index(character))[2:].rjust(bits, '0')

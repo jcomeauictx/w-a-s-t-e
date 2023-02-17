@@ -5,9 +5,16 @@ Implementation of ideas in the addressing RFC
 import logging
 from geohash import encode as geohash_encode, decode as geohash_decode
 
-CONSONANTS = list('bcdfghjklmnpqrstvwxyz')
+CONSONANTS = list('bcdfghjklmnprstvwxyz')
+CONSONANTS += [
+    'bl', 'br', 'ch', 'dr', 'fl', 'fr', 'gl', 'gr', 'll', 'pl', 'pr', 'zh'
+]
 VOWELS = list('aeiou')
+VOWELS += ['ae', 'ai', 'oa']
 ALPHABET = [c + v for c in CONSONANTS for v in VOWELS]
+REPLACE = (('llae', 'qua'), ('llai', 'que'), ('lloa', 'qui'), ('groa', 'quo'))
+for _ in dict(REPLACE):
+    ALPHABET[ALPHABET.index(_)] = dict(REPLACE)[_]
 logging.debug('alphabet: %s, length: %s', ALPHABET, len(ALPHABET))
 
 class Encoders():
@@ -70,8 +77,7 @@ class Encoders():
         '''
         encode geohash address
 
-        >>> Encoders.format2(56.0, -79.0)
-        'petaluma'
+        >>> Encoders.format(65.15, -129.36)
         '''
         return (geohash_encode(latitude, longitude, alphabet=ALPHABET))
 
@@ -150,7 +156,7 @@ class Decoders():
 
         # this turns out to be on Innetalling Island in the Hudson Bay!
         >>> Decoders.format2('petaluma 1')
-        ((56.0, -79.0), '1')
+        ((65.15, -129.36), '1')
         '''
         string, number = address.split()
         return (geohash_decode(string, alphabet=alphabet), number)
