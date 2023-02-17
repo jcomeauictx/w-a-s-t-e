@@ -147,6 +147,7 @@ class Decoders():
         decode geohash address
 
         >>> Decoders.format2('petaluma 1')
+        ((56.0, -79.0), '1')
         '''
         string, number = address.split()
         return (geohash_decode(string, alphabet=alphabet), number)

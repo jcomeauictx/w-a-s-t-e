@@ -56,15 +56,15 @@ def encode(latitude, longitude, error_override=None, alphabet=ALPHABET,
         raise ValueError('latitude too imprecise for max_error')
     bitstring = pad(bitstring, alphabet)
     logging.debug('bitstring length: %s', len(bitstring))
-    geohash = ''
+    geohash = []
     for index in range(0, len(bitstring), 5):
-        geohash += alphabet[int(bitstring[index:index + 5], 2)]
+        geohash += [alphabet[int(bitstring[index:index + 5], 2)]]
     if prefer_odd and not len(geohash) % 2:
         # chopping a character will affect error of both lat and lon
         check = decode(geohash[:-1], return_error=True)
         if check[0] <= max_error[0] and check[1] <= max_error[1]:
             geohash = geohash[:-1]
-    return geohash
+    return ''.join(geohash)
 
 def decode(geohash, alphabet=ALPHABET, return_error=False):
     '''
@@ -77,6 +77,12 @@ def decode(geohash, alphabet=ALPHABET, return_error=False):
     '''
     bits = bit_length(alphabet)  # for padding bitstring
     binary = ''
+    if str(alphabet) == alphabet:  # checking we have a normal alphabet
+        split = list  # if so, easy to split geohash into pieces
+    else:
+        split = re.compile('^(?:' + '|'.join(alphabet) + ')').findall
+    geohash = split(geohash)
+    logging.debug('split geohash: %s', geohash)
     for character in geohash:
         binary += bin(alphabet.index(character))[2:].rjust(bits, '0')
     logging.debug('binary: %s', binary)
