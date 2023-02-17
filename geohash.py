@@ -36,6 +36,7 @@ def encode(latitude, longitude, error_override=None, alphabet=ALPHABET,
     if error_override is not None:
         max_error = (float(error_override), float(error_override))
     bitstring = ''
+    bits = bit_length(alphabet)  # for iterating over bitstring
     error = [sys.maxsize, sys.maxsize]
     while error[1] > max_error[1]:
         # start with longitude. latitude can be truncated.
@@ -57,8 +58,8 @@ def encode(latitude, longitude, error_override=None, alphabet=ALPHABET,
     bitstring = pad(bitstring, alphabet)
     logging.debug('bitstring length: %s', len(bitstring))
     geohash = []
-    for index in range(0, len(bitstring), 5):
-        geohash += [alphabet[int(bitstring[index:index + 5], 2)]]
+    for index in range(0, len(bitstring), bits):
+        geohash += [alphabet[int(bitstring[index:index + bits], 2)]]
     if prefer_odd and not len(geohash) % 2:
         # chopping a character will affect error of both lat and lon
         logging.debug('checking error of odd geohash %s', geohash[:-1])
@@ -208,7 +209,7 @@ def significant_digits(error):
     '''
     digits = 0
     if error * 10 < 1:
-        error = str(error)
+        error = '%.12f' % error
         match = re.search(r'\.(0+)', error)
         if not match:
             raise ValueError('Strange error value %s' % error)
