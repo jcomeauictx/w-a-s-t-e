@@ -69,9 +69,11 @@ class Encoders():
     def format2(latitude, longitude):
         '''
         encode geohash address
+
+        >>> Encoders.format2(56.0, -79.0)
+        'petaluma'
         '''
-        string, number = address.split()
-        return (geohash_decode(string), number)
+        return (geohash_encode(latitude, longitude, alphabet=ALPHABET))
 
 class Decoders():
     '''
@@ -146,6 +148,7 @@ class Decoders():
         '''
         decode geohash address
 
+        # this turns out to be on Innetalling Island in the Hudson Bay!
         >>> Decoders.format2('petaluma 1')
         ((56.0, -79.0), '1')
         '''
