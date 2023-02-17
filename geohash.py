@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -OO
 '''
 implementing Gustavo Niemeyer's geohash from Wikipedia article
 

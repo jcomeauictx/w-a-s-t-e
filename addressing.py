@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -OO
 '''
 Implementation of ideas in the addressing RFC
 '''
@@ -156,11 +156,14 @@ class Decoders():
         decode geohash address
 
         # this turns out to be in the north Atlantic off Prince Patrick Island!
-        >>> Decoders.format_2('petaluma 1')
+        >>> Decoders.format_2('petaluma')
         ((77.15, -127.86), '1')
         '''
-        string, number = address.split()
-        return (geohash_decode(string, alphabet=alphabet), number)
+        try:
+            string, number = address.split()
+            return (geohash_decode(string, alphabet=alphabet), number)
+        except ValueError:
+            return geohash_decode(address, alphabet=alphabet)
 
 if __name__ == '__main__':
     ARGS = sys.argv[1:]
