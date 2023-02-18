@@ -13,10 +13,9 @@ logging.basicConfig(level=logging.DEBUG if __debug__ else logging.WARN)
 
 ALPHABET = '0123456789bcdefghjkmnpqrstuvwxyz'
 
-def encode(latitude, longitude, error_override=None, alphabet=ALPHABET,
-           prefer_odd=False):
+def encode(latitude, longitude, error_override=None, alphabet=ALPHABET):
     '''
-    encode latitude and longitude into Geohash format
+    encode latitude and longitude into the shortest possible Geohash
 
     I didn't actually see an explanation of this, just figured it out from
     the decode example.
@@ -26,9 +25,12 @@ def encode(latitude, longitude, error_override=None, alphabet=ALPHABET,
     max_error is calculated from number of digits of precision, but if
     `error_override` is provided, it is used for both latitude and longitude.
 
-    `prefer_odd` will return an odd-length geohash if allowed by max_error
+    because precision will most likely *not* be the same as that used by
+    the decoder, because of bitstring padding and other heuristics
+    (wild-assed guesses), we will just try shortening the geohash until it
+    fails the error check.
 
-    >>> encode(42.605, -5.603, .03, prefer_odd=True)
+    >>> encode(42.605, -5.603, .03)
     'ezs42'
     '''
     spread = [[-90, 90], [-180, 180]]
@@ -60,12 +62,7 @@ def encode(latitude, longitude, error_override=None, alphabet=ALPHABET,
     geohash = []
     for index in range(0, len(bitstring), bits):
         geohash += [alphabet[int(bitstring[index:index + bits], 2)]]
-    if prefer_odd and not len(geohash) % 2:
-        # chopping a character will affect error of both lat and lon
-        logging.debug('checking error of odd geohash %s', geohash[:-1])
-        check = decode(geohash[:-1], return_error=True)
-        if check[0] <= max_error[0] and check[1] <= max_error[1]:
-            geohash = geohash[:-1]
+    geohash = shortest(geohash, max_error, alphabet=alphabet)
     return ''.join(geohash)
 
 def decode(geohash, alphabet=ALPHABET, return_error=False):
@@ -84,10 +81,16 @@ def decode(geohash, alphabet=ALPHABET, return_error=False):
     else:
         split = re.compile('(?:' + '|'.join(alphabet) + ')').findall
     logging.debug('pre-split geohash: %s', geohash)
-    geohash = [piece.lower() for piece in split(geohash)]
+    if str(geohash) == geohash:  # it may have already been split
+        geohash = [piece.lower() for piece in split(geohash)]
     logging.debug('split geohash: %s', geohash)
     for character in geohash:
-        binary += bin(alphabet.index(character))[2:].rjust(bits, '0')
+        logging.debug('getting binary code for character %s', character)
+        try:
+            binary += bin(alphabet.index(character))[2:].rjust(bits, '0')
+        except (IndexError, ValueError) as problem:
+            raise ValueError(
+                '%s not found in %s' % (character, alphabet)) from problem
     logging.debug('binary: %s', binary)
     # binary string is longitude bits alternating with latitude
     latitude, longitude = [-90, 90], [-180, 180]
@@ -216,3 +219,20 @@ def significant_digits(error):
             raise ValueError('Strange error value %s' % error)
         digits = len(match.group(1))
     return digits
+
+def shortest(geohash, max_error, alphabet=ALPHABET):
+    '''
+    keep shortening geohash until it fails error check
+
+    start with full-length geohash, though redundant, it helps debugging
+    '''
+    offset = len(geohash)
+    while offset >= 0:
+        logging.debug('checking error of shorter geohash %s', geohash[:offset])
+        check = decode(geohash[:offset], alphabet=alphabet, return_error=True)
+        logging.debug('check: %s, max_error: %s', check, max_error)
+        if check[0] > max_error[0] or check[1] > max_error[1]:
+            break
+        else:
+            offset -= 1
+    return geohash[:offset + 1]

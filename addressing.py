@@ -78,7 +78,7 @@ class Encoders():
         encode geohash address
 
         >>> Encoders.format_2(77.15, -127.86)
-        'petalumawae'
+        'petaluma'
         '''
         return geohash_encode(latitude, longitude, alphabet=ALPHABET)
 
