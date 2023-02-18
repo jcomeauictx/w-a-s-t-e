@@ -117,9 +117,15 @@ def format_0(latitude, longitude, direction, streetword, position):
 # Drawbacks
 [drawbacks]: #drawbacks
 
-No known drawbacks. Even in developed countries where street names and numbers
-are always assigned before construction, this method could be voluntarily used
-as an alternative.
+Even in developed countries where street names and numbers are always
+assigned before construction, this method could be voluntarily used as 
+an alternative.
+
+However, formats 0 and 1 serve only to identify a point location; the
+"street name" is purely mythical, and except for a perfect north-south
+or east-west orientation, will change for almost every address. These
+cannot, then, be used for permissionless naming of streets as implied by
+the [motivation](#motivation) section.
 
 # Rationale and alternatives
 [rationale-and-alternatives]: #rationale-and-alternatives
@@ -140,4 +146,18 @@ All of this is unresolved at this time (2023-02-10).
 # Future possibilities
 [future-possibilities]: #future-possibilities
 
-Nothing considered at the moment (2023-02-10).
+Currently working on format 2, an approach which should allow naming of not
+only streets, but cities, countries, entities of any arbitrary size. For
+streets, not only the GPS coordinates of the middle (both length and width)
+will be required, but also the direction and maximum length to the nearest
+power of 10, from 0 to 7 (from 1 to 10000000). Numbering will be in
+meters from the center, with odd numbers representing "left" (going in the
+"direction" selected for the road) and even numbers on the right. For a street
+with the maximum length, the default, 10000, means actually 5000km or 3100
+miles, and the midpoint will be numbered 5000000 on the right side of the road
+and 4999999 on the left. If this turns out to be too short, it can be doubled
+with the use of a single bit more.
+
+A special case, that with an exponent of zero, will have only one possible
+number, 1. This will be the equivalent of formats 0 or 1, specifying only
+a point location.
