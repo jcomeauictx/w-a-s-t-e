@@ -6,12 +6,13 @@ import  sys
 import logging
 from geohash import encode as geohash_encode, decode as geohash_decode
 
-CONSONANTS = list('bcdfghjklmnprstvwxyz')
+CONSONANTS = list('bcdfghjklmnprstvwxyz')  # we add q "manually" below
 CONSONANTS += [
     'bl', 'br', 'ch', 'dr', 'fl', 'fr', 'gl', 'gr', 'll', 'pl', 'pr', 'zh'
 ]
 VOWELS = ['ae', 'ai', 'oa'] + list('aeiou')
 ALPHABET = [c + v for c in CONSONANTS for v in VOWELS]
+# replace some weird combinations with 'qu' combos
 REPLACE = (('llae', 'qua'), ('llai', 'que'), ('lloa', 'qui'), ('groa', 'quo'))
 for _ in dict(REPLACE):
     ALPHABET[ALPHABET.index(_)] = dict(REPLACE)[_]
