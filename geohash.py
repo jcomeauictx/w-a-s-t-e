@@ -89,6 +89,7 @@ def decode(geohash, alphabet=ALPHABET, return_error=False):
         try:
             binary += bin(alphabet.index(character))[2:].rjust(bits, '0')
         except (IndexError, ValueError) as problem:
+            # pylint: disable=bad-option-value, consider-using-f-string
             raise ValueError(
                 '%s not found in %s' % (character, alphabet)) from problem
     logging.debug('binary: %s', binary)
@@ -212,7 +213,7 @@ def significant_digits(error):
     '''
     digits = 0
     if error * 10 < 1:
-        # pylint: disable=bad-option-value,consider-using-f-string
+        # pylint: disable=bad-option-value, consider-using-f-string
         error = '%.12f' % error
         match = re.search(r'\.(0+)', error)
         if not match:
@@ -233,6 +234,5 @@ def shortest(geohash, max_error, alphabet=ALPHABET):
         logging.debug('check: %s, max_error: %s', check, max_error)
         if check[0] > max_error[0] or check[1] > max_error[1]:
             break
-        else:
-            offset -= 1
+        offset -= 1
     return geohash[:offset + 1]
