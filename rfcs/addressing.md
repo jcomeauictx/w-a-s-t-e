@@ -155,8 +155,8 @@ meters from the center, with odd numbers representing "left" (going in the
 "direction" selected for the road) and even numbers on the right. For a street
 with the maximum length, the default, 10000, means actually 5000km or 3100
 miles, and the midpoint will be numbered 5000000 on the right side of the road
-and 4999999 on the left. If this turns out to be too short, it can be doubled
-with the use of a single bit more.
+and 4999999 on the left. If this turns out to be too short, it can be upped
+ten times with the use of a single bit more.
 
 A special case, that with an exponent of zero, will have only one possible
 number, 1. This will be the equivalent of formats 0 or 1, specifying only
