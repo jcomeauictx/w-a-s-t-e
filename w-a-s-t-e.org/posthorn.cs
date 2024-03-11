@@ -18,5 +18,5 @@ pagesize /pagewidth exch def /pageheight exch def
   -150 rotate  % reorient left to right
 } bind def
 gsave posthorn stroke grestore
-1 unit 0 rmoveto posthorn stroke
+-1 unit 0 rmoveto posthorn stroke
 showpage
