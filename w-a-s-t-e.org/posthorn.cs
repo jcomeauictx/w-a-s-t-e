@@ -11,6 +11,8 @@ pagesize /pagewidth exch def /pageheight exch def
 segment 0 rlineto  # mouthpiece to start of loop
 currentpoint radius sub radius 90 450 arc  # the loop
 segment 0 rlineto  # loop to start of bell
--30 rotate 3 {60 rotate bell 0 rlineto} repeat 30 rotate
+30 rotate  bell 0 rlineto
+-120 rotate bell 0 rlineto
+-120 rotate bell 0 rlineto
 stroke
 showpage
