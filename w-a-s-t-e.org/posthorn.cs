@@ -14,5 +14,6 @@ segment 0 rlineto  # loop to start of bell
 30 rotate  bell 0 rlineto
 -120 rotate bell 0 rlineto
 -120 rotate bell 0 rlineto
+-150 rotate  # reorient left to right
 stroke
 showpage
