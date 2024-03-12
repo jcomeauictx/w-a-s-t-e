@@ -20,6 +20,9 @@ pagesize /pagewidth exch def /pageheight exch def
 } bind def
 gsave posthorn stroke grestore
 -1 unit 0 rmoveto currentpoint newpath moveto
-gsave posthorn strokepath pathbbox erase grestore
+gsave posthorn strokepath pathbbox  % gives bounding box llx lly urx ury
+% need to convert to x y width height for rectfill
+2 index sub exch 3 index sub exch
+erase grestore
 posthorn stroke
 showpage
