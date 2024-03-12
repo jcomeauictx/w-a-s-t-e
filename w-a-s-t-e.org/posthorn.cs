@@ -7,7 +7,7 @@ pagesize /pagewidth exch def /pageheight exch def
 /radius segment 2 div def
 /secant {cos 1.0 exch div} bind def  % hypotenuse over near
 /bell 30 secant segment mul def
-/erase {gsave 255 0 0 setrgbcolor rectfill grestore} bind def
+/erase {gsave 1 setgray rectfill grestore} bind def
 1 inch 4 inch moveto
 /posthorn {
   segment 0 rlineto  % mouthpiece to start of loop
