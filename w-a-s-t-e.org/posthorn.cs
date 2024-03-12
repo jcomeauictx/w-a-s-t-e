@@ -30,7 +30,6 @@ pagesize /pagewidth exch def /pageheight exch def
   gsave
   0 0 moveto
   gsave posthorn strokepath pathbbox
-  pstack clear
 } bind def
 /muted-posthorn {  % the ultimate form
   gsave
@@ -41,5 +40,9 @@ pagesize /pagewidth exch def /pageheight exch def
   posthorn stroke
   grestore
 } bind def
-measure newpath
-1 inch 4 inch moveto muted-posthorn showpage
+measure
+4 2 roll  % move llx and lly to top of stack
+exch pop  % get rid of almost-zero llx
+sub  % compute total y offset
+pstack clear
+newpath 1 inch 4 inch moveto muted-posthorn showpage
