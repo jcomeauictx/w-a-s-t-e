@@ -53,4 +53,7 @@ newpath  % clear the horn used for measuring so it doesn't show on `stroke`
 (/hornheight: ) print hornheight =
 (/pagewidth: ) print pagewidth =
 (/pageheight: ) print pageheight =
-1 inch 4 inch moveto muted-posthorn showpage
+pageheight 1 inch sub  % half inch margin
+hornwidth div /ratio exch def
+pagewidth 2 div pageheight moveto -90 rotate
+0.5 inch 0 rmoveto ratio ratio scale muted-posthorn showpage
