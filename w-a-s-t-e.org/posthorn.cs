@@ -44,5 +44,13 @@ measure
 4 2 roll  % move llx and lly to top of stack
 exch pop  % get rid of almost-zero llx
 sub  % compute total y offset
-pstack clear
-newpath 1 inch 4 inch moveto muted-posthorn showpage
+/hornheight exch def
+/hornwidth exch def
+newpath  % clear the horn used for measuring so it doesn't show on `stroke`
+% let's assume page height greater than width, and that horn will fit width
+% if that doesn't work, we need to add more code to compute a better fit
+(/hornwidth: ) print hornwidth =
+(/hornheight: ) print hornheight =
+(/pagewidth: ) print pagewidth =
+(/pageheight: ) print pageheight =
+1 inch 4 inch moveto muted-posthorn showpage
