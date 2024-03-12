@@ -6,7 +6,8 @@ pagesize /pagewidth exch def /pageheight exch def
 /segment 3 unit def  % see README.md
 /radius segment 2 div def
 /secant {cos 1.0 exch div} bind def  % hypotenuse over near
-/bell 30 secant segment mul def 
+/bell 30 secant segment mul def
+/erase {gsave 255 0 0 setrgbcolor rectfill grestore} bind def
 1 inch 4 inch moveto
 /posthorn {
   segment 0 rlineto  % mouthpiece to start of loop
@@ -18,5 +19,5 @@ pagesize /pagewidth exch def /pageheight exch def
   -150 rotate  % reorient left to right
 } bind def
 gsave posthorn stroke grestore
--1 unit 0 rmoveto posthorn stroke
+-1 unit 0 rmoveto posthorn strokepath pathbbox erase
 showpage
