@@ -28,8 +28,9 @@ pagesize /pagewidth exch def /pageheight exch def
 } bind def
 /measure {  % let's measure the muted posthorn so as to render it best
   gsave
-  0 0 moveto
-  gsave posthorn strokepath pathbbox
+  1 unit 0 moveto  % add one unit for the mute
+  posthorn strokepath pathbbox
+  grestore
 } bind def
 /muted-posthorn {  % the ultimate form
   gsave
@@ -42,7 +43,7 @@ pagesize /pagewidth exch def /pageheight exch def
 } bind def
 measure
 4 2 roll  % move llx and lly to top of stack
-exch pop  % get rid of almost-zero llx
+exch pop  % get rid of llx, we're using 0
 sub  % compute total y offset
 /hornheight exch def
 /hornwidth exch def
