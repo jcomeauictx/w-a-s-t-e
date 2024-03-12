@@ -3,6 +3,7 @@
 /inch {72 mul} bind def
 /unit {0.25 inch mul} bind def
 pagesize /pagewidth exch def /pageheight exch def
+1 unit 5 div setlinewidth
 /segment 3 unit def  % see README.md
 /radius segment 2 div def
 /secant {cos 1.0 exch div} bind def  % hypotenuse over near
