@@ -9,3 +9,7 @@ upload:
 	 --exclude=Makefile \
 	 --exclude=README.md \
 	 . $(SERVER):$(DOCROOT)/
+/tmp/posthorn.png: posthorn.ps
+	gs -sDEVICE=pnggray -sOutputFile=$@ -dNOPAUSE -dBATCH $<
+posthorn.png: /tmp/posthorn.png
+	convert $< -rotate -90 $@
